@@ -1,12 +1,14 @@
 # Pi-MobiSec - Secure your computer on unsecure hotspots
 
-Secure your laptop while using public wifi hotspots.  Instead of connecting your laptop directly with public wifi hotspots, you connect your Pi-MobiSec device with it and let it filter and protect the traffic going in and out of your laptop.
+Secure your computer while using public wifi hotspots.  Instead of connecting your computer directly with public wifi hotspots, you connect your Pi-MobiSec device with it and let it filter and protect the traffic going in and out of your computer.
 
 Pi-MobiSec turns your Raspberry Pi Zero W (others will be supported in the near future) into a mobile firewall protecting your computer and optionally your traffic while you are using unsecure or public hotspots.
 
 ## Features
 * Plug and play
-* Firewall to protect your laptop from unwanted access
+* Firewall to protect your computer from unwanted access
+* Hide your connection from ip scanners
+* Prevent fingerprinting the operating system on your computer
 * Use public DNS servers to prevent the hotspot owner from logging your DNS queries (Optional)
 * VPN support to prevent others from spying on your connection (Comming soon)
 * Easy to use Webinterface (Comming soon)
