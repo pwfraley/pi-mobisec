@@ -1,4 +1,4 @@
-# Pi-MobiSec - Secure your computer on unsecure networks
+# Pi-MobiSec<br><small>Secure your computer on unsecure networks</small>
 
 Secure your computer while using public wifi hotspots or other unsecure networks.  Instead of connecting your computer directly with public wifi hotspots, you connect your Pi-MobiSec device with it and let it filter and protect the traffic going in and out of your computer.
 
