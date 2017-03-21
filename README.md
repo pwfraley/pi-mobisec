@@ -1,6 +1,6 @@
-# Pi-MobiSec - Secure your computer on unsecure hotspots
+# Pi-MobiSec - Secure your computer on unsecure networks
 
-Secure your computer while using public wifi hotspots.  Instead of connecting your computer directly with public wifi hotspots, you connect your Pi-MobiSec device with it and let it filter and protect the traffic going in and out of your computer.
+Secure your computer while using public wifi hotspots or other unsecure networks.  Instead of connecting your computer directly with public wifi hotspots, you connect your Pi-MobiSec device with it and let it filter and protect the traffic going in and out of your computer.
 
 Pi-MobiSec turns your Raspberry Pi Zero W (others will be supported in the near future) into a mobile firewall protecting your computer and optionally your traffic while you are using unsecure or public hotspots.
 
@@ -19,10 +19,12 @@ To install Pi-MobiSec you need a RaspberryPi Zero W (the one with build in Wifi)
 
 Simply ssh into your PiZero and execute:
 
-```
-curl -sSL https://install.pi-mobisec.net | sudo bash
+```bash
+curl -sSL https://raw.githubusercontent.com/pwfraley/pi-mobisec/master/install/install.sh | sudo bash
+# Comming soon:
+# curl -sSL https://install.pi-mobisec.net | sudo bash
 ```
 
 ## Full Installation
 
-The full installation will help you setup and secure your PiZero, before starting the Pi-MobiSec installation.
+For full installation instructions, inlcuding securing your PiZero W, please visit the [Wiki](https://github.com/pwfraley/pi-mobisec/wiki).

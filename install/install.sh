@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Pi-MobiSec: A security layer for using public hotspots
 # (c) 2017 Patrick W. Fraley (https://pi-mobisec.net)
-# System protection while using hotspots.
+# Secure your computer on unsecure networks.
 #
 # Installs Pi-MobiSec
 #
@@ -70,8 +70,7 @@ verify_diskspace() {
     if [[ "${skipSpaceCheck}" == true ]]; then
         echo "::: --no_verify_disk_space passed to script, skipping free disk space verification!"
     else
-        # 50MB is the minimum space needed (45MB install (includes web admin bootstrap/jquery libraries etc) + 5MB one day of logs.)
-        # - Fourdee: Local ensures the variable is only created, and accessible within this function/void. Generally considered a "good" coding practice for non-global variables.
+        # 50MB is the minimum space needed (45MB install (includes web admin libraries etc) + 5MB one day of logs.)
         echo "::: Verifying free disk space..."
         local required_free_kilobytes=51200
         local existing_free_kilobytes=$(df -Pk | grep -m1 '\/$' | awk '{print $4}')
