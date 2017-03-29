@@ -13,10 +13,16 @@ set -e
 ###### global variables ######
 tmpLog=/tmp/pi-mobisec.log
 skipSpaceCheck=false
+installWeb=false
 
-APP_REPO=""
-APP_SETTINGS=/etc/pimobisec
-LOCAL_REPO=${APP_SETTINGS}/.pimobisec
+PI_MOBISEC_WEB_REPO="https://github.com/pwfraley/pi-mobisec-web.git"
+PI_MOBISEC_WEB_DEST="/srv/www"
+
+PI_MOBISEC_APP_REPO="https://github.com/pwfraley/pi-mobisec.git"
+PI_MOBISEC_LOCAL_REPO=${PI_MOBISEC_APP_SETTINGS}/.pimobisec
+
+PI_MOBISEC_APP_SETTINGS=/etc/pimobisec
+PI_MOBISEC_INSTALL_DIR=/opt/pimobisec
 
 INTERNAL_NETWORK_DEVICE="usb0"
 INTERNAL_IPV4_ADDRESS="10.235.58.1"
@@ -42,6 +48,69 @@ c=$(( columns / 2 ))
 r=$(( r < 20 ? 20 : r ))
 c=$(( c < 70 ? 70 : c ))
 
+is_repo() {
+    # Use git to check if directory is currently under VCS, return the value 128
+    # if directory is not a repo. Return 1 if directory does not exist.
+    local directory="${1}"
+    local curdir
+    local rc
+
+    curdir="${PWD}"
+    if [[ -d "${directory}" ]]; then
+        # git -C is not used here to support git versions older than 1.8.4
+        cd "${directory}"
+        git status --short &> /dev/null || rc=$?
+    else
+        # non-zero return code if directory does not exist
+        rc=1
+        fi
+        cd "${curdir}"
+    return "${rc:-0}"
+}
+
+git_files() {
+    local repoUrl="${1}"
+    local destPath="${2}"
+    local curdir
+
+    curdir="${PWD}"
+    if is_repo "${destPath}"; then
+        echo "::: Updating ${repoUrl} in ${destPath}"
+        if [[ -d "${destPath}" ]]; then
+            rm -rf "${destPath}"
+        fi
+        cd "${directory}" &> /dev/null || return 1
+        git stash --all --quiet &> /dev/null || true # Okay for stash failure
+        git clean --force -d || true # Okay for already clean directory
+        git pull --quiet &> /dev/null || return $?
+        cd "${curdir}" &> /dev/null || return 1
+    else
+        echo "::: Cloning ${repoUrl} into ${destPath}"
+        git clone -q --depth 1 "${repoUrl}" "${destPath}" &> /dev/null || return $?
+    fi
+    return 0
+}
+
+clone_update_git_repos() {
+    if [[ "${installWeb}" == true ]]; then
+        git_files "${PI_MOBISEC_WEB_REPO}" "${PI_MOBISEC_WEB_DEST}" || { echo "::: Could not clone or update repository ${PI_MOBISEC_WEB_REPO}."; exit 1; }
+    fi
+    git_files "${PI_MOBISEC_APP_REPO}" "${PI_MOBISEC_LOCAL_REPO}" || { echo "::: Could not clone or update repository ${PI_MOBISEC_APP_REPO}."; exit 1; }
+}
+
+create_dirs() {
+    # APP Settings directory
+    if [ ! -d "${PI_MOBISEC_APP_SETTINGS}" ]; then
+        mkdir "${PI_MOBISEC_APP_SETTINGS}"
+        chown root:root "${PI_MOBISEC_APP_SETTINGS}"
+    fi
+    # INSTALL directory
+    if [ ! -d "${PI_MOBISEC_INSTALL_DIR}" ]; then
+        mkdir "${PI_MOBISEC_INSTALL_DIR}"
+        chown root:root "${PI_MOBISEC_INSTALL_DIR}"
+    fi
+}
+
 check_distro() {
     if command -v apt-get &> /dev/null; then
         ### Debian Based (Raspian, Armbian, Ubuntu)
@@ -51,7 +120,7 @@ check_distro() {
         APP_DEPS=(dnsmasq sudo unzip)
     else
         ### Others are not yet supported (Fedora, Arch)
-        echo "OS distribution not supported"
+        echo "::: OS distribution not supported"
         exit
     fi
 }
@@ -384,9 +453,17 @@ main() {
     ipSettingsDialogs
     setup_interface
 
+    ### Prepare system
+    # Create directories
+    create_dirs
+
+    # Clone repos
+    clone_update_git_repos
+
+    ### Prepare required software
     install_dependent_packages APP_DEPS[@]
 
-    ### Prepare system
+    ### Setup system
     # Setup usb otg ether
     setup_usb_otg_ether
     # Setup ip forwarding (sysctl.conf)
@@ -396,6 +473,7 @@ main() {
     # Setup firewall (iptables, MASQ, Deny Access from Public interface, Allow all traffic from usb0)
     setup_firewall
 
+    # Say thank you and good bye
     finishDialogs
 }
 
